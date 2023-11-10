@@ -53,7 +53,10 @@ class DMCAgent:
     ):
         self.use_raw = False
         self.device = 'cuda:'+device if device != "cpu" else "cpu"
-        self.net = DMCNet(state_shape, action_shape, mlp_layers).to(self.device)
+        self.net = DMCNet(state_shape, action_shape, mlp_layers)
+        # Use all GPUS
+        self.net = nn.DataParallel(self.net)
+        self.net = self.net.to(self.device)
         self.exp_epsilon = exp_epsilon
         self.action_shape = action_shape
 

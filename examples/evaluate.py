@@ -12,6 +12,7 @@ from rlcard.utils import (
     get_device,
     set_seed,
     tournament,
+    filter_cuda,
 )
 
 def load_model(model_path, env=None, position=None, device=None):
@@ -97,6 +98,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda
+    os.environ["CUDA_VISIBLE_DEVICES"] = filter_cuda(args.cuda)
     evaluate(args)
 

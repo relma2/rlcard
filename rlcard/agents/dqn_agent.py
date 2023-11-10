@@ -356,6 +356,8 @@ class Estimator(object):
 
         # set up Q model and place it in eval mode
         qnet = EstimatorNetwork(num_actions, state_shape, mlp_layers)
+        # Use all GPUs
+        nn.DataParallel(qnet)
         qnet = qnet.to(self.device)
         self.qnet = qnet
         self.qnet.eval()
