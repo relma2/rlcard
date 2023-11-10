@@ -20,4 +20,4 @@ mkdir -p experiments/gin_rummy_dqn_result
 
 echo "Beginning DQN model training"
 
-python3 examples/run_rl.py --env gin-rummy --algorithm dqn  --num_episodes 10000 --cuda $cud -save_every 2000 --log_dir experiments/gin_rummy_dqn_result
+python3 examples/run_rl.py --env gin-rummy --algorithm dqn  --num_episodes 10000 --cuda $cud --save_every 2000 --log_dir experiments/gin_rummy_dqn_result
