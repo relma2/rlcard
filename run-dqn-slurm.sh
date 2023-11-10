@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -n 64
+#SBATCH -n 16
 #SBATCH -J "DQN Training"
 #SBATCH -t 24:00:00
 #SBATCH --gres=gpu:8
