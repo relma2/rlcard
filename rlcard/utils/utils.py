@@ -24,7 +24,7 @@ def get_device():
         print("--> Running on the GPU")
     elif torch.cuda.is_available():
         # Use all cuda GPUs
-        device = torch.device("cuda:" + os.environ["CUDA_VISIBLE_DEVICES"])
+        device = torch.device("cuda")
         print("--> Running on the GPU(s) " + os.environ["CUDA_VISIBLE_DEVICES"])
     else:
         device = torch.device("cpu")
