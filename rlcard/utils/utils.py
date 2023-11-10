@@ -45,7 +45,7 @@ def filter_cuda(argscuda):
     if set(lcuda) != set(lcudafilter):
         print("Warning -- Provided Cuda devices not in available cuda devices.")
         print(f"Provided: {argscuda} \nUsing: {set(lcudafilter)}")
-    return ",".join(set(lcudafilter))
+    return ",".join(lcudafilter)
 
 def init_standard_deck():
     ''' Initialize a standard deck of 52 cards
