@@ -9,6 +9,7 @@ module load python/3.11.6/ao5olvd
 module load cuda
 module load miniconda3
 cud="0,1,2,3,4,5,6,7"
+SECONDS=0
 
 cd ~/rlcard
 
@@ -20,4 +21,7 @@ mkdir -p experiments/gin_rummy_dqn_result
 
 echo "Beginning DQN model training"
 
-python3 examples/run_rl.py --env gin-rummy --algorithm dqn  --num_episodes 10000 --cuda $cud --save_every 2000 --log_dir experiments/gin_rummy_dqn_result
+python3 examples/run_rl.py --env gin-rummy --algorithm dqn  --num_episodes 100000 --cuda $cud --save_every 5000 --log_dir experiments/gin_rummy_dqn_result
+
+#Display time it took 
+echo $(($SECONDS/86400))d $(($(($SECONDS - $SECONDS/86400*86400))/3600))h:$(($(($SECONDS - $SECONDS/86400*86400))%3600/60))m:$(($(($SECONDS - $SECONDS/86400*86400))%60))s
