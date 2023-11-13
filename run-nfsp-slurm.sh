@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH -n 16
 #SBATCH -J "NFSP Training"
-#SBATCH -t 24:00:00
+#SBATCH -p long
+#SBATCH -t 120:00:00
 #SBATCH --gres=gpu:8
 # All the gpus
 
@@ -16,12 +17,20 @@ cd ~/rlcard
 # conda env setup already done manually
 conda activate rlcard
 
-rm -rf experiments/gin_rummy_nfsp_result
 mkdir -p experiments/gin_rummy_nfsp_result
 
 echo "Beginning NFSP model training"
 
-python3 examples/run_rl.py --env gin-rummy --algorithm nfsp --num_episodes 100000 --cuda $cud --save_every 5000 --log_dir experiments/gin_rummy_nfsp_result
+# If checkpoint file exists, load filename, else empty string
+checkpoint=""
+if [ -f experiments/gin_rummy_nfsp_result/checkpoint_nfsp.pt ];then
+    checkpoint="experiments/gin_rummy_dqn_result/checkpoint_nfsp.pt"
+fi
+
+python3 examples/run_rl.py --env gin-rummy --algorithm nfsp --num_episodes 100000 --cuda $cud --save_every 5000 \
+    --log_dir experiments/gin_rummy_nfsp_result \
+    --load_checkpoint_path $checkpoint
+
 
 #Display time it took 
 echo $(($SECONDS/86400))d $(($(($SECONDS - $SECONDS/86400*86400))/3600))h:$(($(($SECONDS - $SECONDS/86400*86400))%3600/60))m:$(($(($SECONDS - $SECONDS/86400*86400))%60))s
