@@ -3,13 +3,13 @@
 #SBATCH -J "DQN Training"
 #SBATCH -p long
 #SBATCH -t 120:00:00
-#SBATCH --gres=gpu:8
+#SBATCH --gres=gpu:4
 # All the gpus
 
 module load python/3.11.6/ao5olvd
 module load cuda
 module load miniconda3
-cud="0,1,2,3,4,5,6,7"
+cud="0,1,2,3"
 SECONDS=0
 
 cd ~/rlcard
