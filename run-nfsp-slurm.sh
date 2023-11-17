@@ -24,7 +24,7 @@ echo "Beginning NFSP model training"
 # If checkpoint file exists, load filename, else empty string
 checkpoint=""
 if [ -f experiments/gin_rummy_nfsp_result/checkpoint_nfsp.pt ];then
-    checkpoint="experiments/gin_rummy_dqn_result/checkpoint_nfsp.pt"
+    checkpoint="experiments/gin_rummy_nsfp_result/checkpoint_nfsp.pt"
 fi
 
 python3 examples/run_rl.py --env gin-rummy --algorithm nfsp --num_episodes 100000 --cuda $cud --save_every 5000 \
