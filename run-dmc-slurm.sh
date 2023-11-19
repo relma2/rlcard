@@ -21,7 +21,7 @@ mkdir -p experiments/gin_rummy_dmc_result
 
 echo "Training DMC"
 
-python3 examples/run_dmc.py --env gin-rummy --cuda $cud --xpid gin_rummy --save_interval 60 --savedir experiments/gin_rummy_dmc_result
+python3 examples/run_dmc.py --env gin-rummy --cuda "" --xpid gin_rummy --save_interval 60 --savedir experiments/gin_rummy_dmc_result
 
 #Display time it took
 echo $(($SECONDS/86400))d $(($(($SECONDS - $SECONDS/86400*86400))/3600))h:$(($(($SECONDS - $SECONDS/86400*86400))%3600/60))m:$(($(($SECONDS - $SECONDS/86400*86400))%60))s
