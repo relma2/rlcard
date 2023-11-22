@@ -1,15 +1,16 @@
 #!/bin/bash
-#SBATCH -n 16
+#SBATCH -n 32
+# This requires all CPU computation
 #SBATCH -J "DMC Training"
 #SBATCH -p long
 #SBATCH -t 120:00:00
-#SBATCH --gres=gpu:4
-# All the gpus
+#SBATCH --gres=gpu:1
+# No GPUs
 
 module load python/3.11.6/ao5olvd
 module load cuda
 module load miniconda3
-cud="0,1,2,3"
+cud="0"
 SECONDS=0
 
 cd ~/rlcard
