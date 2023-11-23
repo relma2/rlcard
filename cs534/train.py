@@ -22,7 +22,13 @@ from rlcard.models.gin_rummy_rule_models import GinRummyNoviceRuleAgent
 available_agents = ["dqn", "nfsp"]
 available_agents_message = "Potential agents are '" + "', '".join(available_agents) + "'"
 
-def get_agent_name():
+def get_agent_name(args):
+    if (args.agent != ""):
+        if args.agent in available_agents:
+            return args.agent
+        else:
+            raise Exception("No such agent.")
+
     agent = ""
     print(available_agents_message)
     print("Please select agent: ", end="")
@@ -38,8 +44,9 @@ def get_agent_name():
 
     return agent
 
-def configure_agent_training(agent_name, env):
+def configure_agent_training(agent_name, env, args):
     start_episodes = 0
+    num_episodes = 0
     if agent_name == "dqn":
         checkpoint_path = "cs534/models/dqn/checkpoint/"
         if not os.path.exists(checkpoint_path):
@@ -78,14 +85,31 @@ def configure_agent_training(agent_name, env):
                     rule=gin_rummy_rule_filter
                 )
         
-    if start_episodes != 0:
-        print(f"This model has already been trained for {start_episodes} episodes.")
-    print("How many more episodes should this model train for?")
-    print("This should be be a number divisible by 100: ", end="")
-    num_episodes = int(input())
+    if (args.episodes > 0):
+        num_episodes = args.episodes
+    else:
+        if start_episodes != 0:
+            print(f"This model has already been trained for {start_episodes} episodes.")
+        print("How many more episodes should this model train for?")
+        print("This should be be a number divisible by 100: ", end="")
+        num_episodes = int(input())
+
     return (agent, start_episodes, num_episodes)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser("RLCard Training")
+    parser.add_argument(
+        '--agent',
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        '--episodes',
+        type=int,
+        default=0,
+    )
+    args = parser.parse_args()
+
     print()
 
     # Prepare testing.
@@ -106,10 +130,10 @@ if __name__ == '__main__':
 
     # Get agent
     print("What would you like to train?")
-    agent_name = get_agent_name()
+    agent_name = get_agent_name(args)
 
     # Get actual agent
-    agent, start_episodes, num_episodes = configure_agent_training(agent_name, env)
+    agent, start_episodes, num_episodes = configure_agent_training(agent_name, env, args)
     opponent = GinRummyNoviceRuleAgent()
     env.set_agents([agent, opponent])
 
