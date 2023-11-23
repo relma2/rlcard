@@ -44,7 +44,6 @@ class GinRummyEnv(Env):
             extracted_state['raw_obs'] = obs
         else:
             discard_pile = self.game.round.dealer.discard_pile
-            stock_pile = self.game.round.dealer.stock_pile
             top_discard = [] if not discard_pile else [discard_pile[-1]]
             dead_cards = discard_pile[:-1]
             current_player = self.game.get_current_player()
