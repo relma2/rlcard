@@ -21,7 +21,7 @@ class GinRummyEnv(Env):
         self.name = 'gin-rummy'
         self.game = Game()
         super().__init__(config=config)
-        self.state_shape = [[5, 52] for _ in range(self.num_players)]
+        self.state_shape = [[4, 52] for _ in range(self.num_players)]
         self.action_shape = [None for _ in range(self.num_players)]
 
     def _extract_state(self, state):  # 200213 don't use state ???
@@ -31,12 +31,11 @@ class GinRummyEnv(Env):
             state (dict): dict of original state
 
         Returns:
-            numpy array: 5 * 52 array
-                         5 : current hand (1 if card in hand else 0)
+            numpy array: 4 * 52 array
+                         4 : current hand (1 if card in hand else 0)
                              top_discard (1 if card is top discard else 0)
                              dead_cards (1 for discards except for top_discard else 0)
                              opponent known cards (likewise)
-                             unknown cards (likewise)  # is this needed ??? 200213
         '''
         if self.game.is_over():
             obs = np.array([self._utils.encode_cards([]) for _ in range(5)])
@@ -51,13 +50,11 @@ class GinRummyEnv(Env):
             current_player = self.game.get_current_player()
             opponent = self.game.round.players[(current_player.player_id + 1) % 2]
             known_cards = opponent.known_cards
-            unknown_cards = stock_pile + [card for card in opponent.hand if card not in known_cards]
             hand_rep = self._utils.encode_cards(current_player.hand)
             top_discard_rep = self._utils.encode_cards(top_discard)
             dead_cards_rep = self._utils.encode_cards(dead_cards)
             known_cards_rep = self._utils.encode_cards(known_cards)
-            unknown_cards_rep = self._utils.encode_cards(unknown_cards)
-            rep = [hand_rep, top_discard_rep, dead_cards_rep, known_cards_rep, unknown_cards_rep]
+            rep = [hand_rep, top_discard_rep, dead_cards_rep, known_cards_rep]
             obs = np.array(rep)
             extracted_state = {'obs': obs, 'legal_actions': self._get_legal_actions(), 'raw_legal_actions': list(self._get_legal_actions().keys())}
             extracted_state['raw_obs'] = obs
