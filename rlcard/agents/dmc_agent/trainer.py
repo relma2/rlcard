@@ -220,7 +220,11 @@ class DMCTrainer:
 
         # Initialize queues
         actor_processes = []
-        ctx = mp.get_context('spawn')
+        spawn_method = 'spawn'
+        # If we are linux, set spawn_method to fork. We use fork on Unix to avoid pickling errors, but cannot use GPU
+        if os.name == 'posix':
+            spawn_method = 'fork'
+        ctx = mp.get_context(spawn_method)
         free_queue = {}
         full_queue = {}
         for device in self.device_iterator:

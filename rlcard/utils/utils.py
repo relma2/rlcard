@@ -18,18 +18,34 @@ def set_seed(seed):
         random.seed(seed)
 
 def get_device():
-    import torch
+    import torch, os
     if torch.backends.mps.is_available():
         device = torch.device("mps:0")
         print("--> Running on the GPU")
     elif torch.cuda.is_available():
-        device = torch.device("cuda:0")
-        print("--> Running on the GPU")
+        # Use all cuda GPUs
+        device = torch.device("cuda")
+        print("--> Running on the GPU(s) " + os.environ["CUDA_VISIBLE_DEVICES"])
     else:
         device = torch.device("cpu")
         print("--> Running on the CPU")
 
     return device    
+
+
+def filter_cuda(argscuda):
+    ''' Filters args.cuda to the numeric values of the form "a,b,c,..."
+    provides warning if provided numbers are not of that form or if devices 
+    not in available cuda devices
+    '''
+    import torch
+    lcuda = argscuda.split(",")
+    lcudafilter = list(filter(lambda x: x.isnumeric(), lcuda))
+    lcudafilter = list(filter(lambda x: int(x) in range(torch.cuda.device_count()), lcudafilter))
+    if set(lcuda) != set(lcudafilter):
+        print("Warning -- Provided Cuda devices not in available cuda devices.")
+        print(f"Provided: {argscuda} \nUsing: {set(lcudafilter)}")
+    return ",".join(lcudafilter)
 
 def init_standard_deck():
     ''' Initialize a standard deck of 52 cards

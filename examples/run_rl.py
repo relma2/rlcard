@@ -14,6 +14,7 @@ from rlcard.utils import (
     reorganize,
     Logger,
     plot_curve,
+    filter_cuda,
 )
 
 def train(args):
@@ -176,7 +177,9 @@ if __name__ == '__main__':
         default=-1)
 
     args = parser.parse_args()
-
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda
+    
+    os.environ["CUDA_VISIBLE_DEVICES"] = filter_cuda(args.cuda)
+    
+    # Run Training
     train(args)
 

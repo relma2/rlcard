@@ -143,6 +143,8 @@ class NFSPAgent(object):
 
         # configure the average policy network
         policy_network = AveragePolicyNetwork(self._num_actions, self._state_shape, self._layer_sizes)
+        # Use all GPUs
+        nn.DataParallel(policy_network)
         policy_network = policy_network.to(self.device)
         self.policy_network = policy_network
         self.policy_network.eval()

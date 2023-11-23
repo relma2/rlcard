@@ -140,6 +140,8 @@ class NFSPAgent(object):
 
         # configure the average policy network
         policy_network = AveragePolicyNetwork(self._num_actions, self._state_shape, self._layer_sizes)
+        # Use all GPUs
+        nn.DataParallel(policy_network)
         policy_network = policy_network.to(self.device)
         self.policy_network = policy_network
         self.policy_network.eval()
@@ -357,6 +359,8 @@ class NFSPAgent(object):
         agent._mode = checkpoint['mode']
         agent.total_t = checkpoint['total_t']
         agent.train_t = checkpoint['train_t']
+        # Use all GPUs
+        nn.DataParallel(agent.policy_network)
         agent.policy_network.to(agent.device)
         agent.policy_network.eval()
         agent.policy_network_optimizer = torch.optim.Adam(agent.policy_network.parameters(), lr=agent._sl_learning_rate)
