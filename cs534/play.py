@@ -18,6 +18,7 @@ from rlcard.envs.gin_rummy import GinRummyEnv
 from rlcard.agents.human_agents.gin_rummy_human_agent.gin_rummy_human_agent import HumanAgent
 from rlcard.models.gin_rummy_rule_models import GinRummyNoviceRuleAgent
 from rlcard.agents.human_agents.gin_rummy_human_agent.gui_gin_rummy.game_app import GameApp
+from train import available_agents
 
 
 class StoredAgent:
@@ -36,7 +37,6 @@ class StoredAgent:
 
 
 available_simple_agents = ["random", "rule"]
-available_agents = ["dqn", "nfsp"]
 available_agents_message = "Potential agents are 'human', '" + "', '".join(available_agents + available_simple_agents) + "'"
 
 def load_model(stored_agent, env, position, device):
