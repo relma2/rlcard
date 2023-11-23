@@ -7,6 +7,7 @@ import torch
 import rlcard
 from agents.dqn_rule_agent import DQNAgent
 from agents.nfsp_rule_agent import NFSPAgent
+from agents.rule_filter import gin_rummy_rule_filter
 from utils.logger import Logger
 from rlcard.utils import (
     get_device,
@@ -45,6 +46,7 @@ def configure_agent_training(agent_name, env):
             os.makedirs(checkpoint_path)
         if os.path.exists(checkpoint_path + "checkpoint_dqn.pt"):
             agent = DQNAgent.from_checkpoint(checkpoint=torch.load(checkpoint_path + "checkpoint_dqn.pt"))
+            agent.rule = gin_rummy_rule_filter
             with open(checkpoint_path + "checkpoint.txt") as f:
                 start_episodes = int(next(f))
         else:
@@ -53,7 +55,8 @@ def configure_agent_training(agent_name, env):
                 state_shape=env.state_shape[0],
                 mlp_layers=[64,64],
                 device=device,
-                save_path=checkpoint_path
+                save_path=checkpoint_path,
+                rule=gin_rummy_rule_filter
         )
     elif agent_name == "nfsp":
         checkpoint_path = "cs534/models/nfsp/checkpoint/"
@@ -61,6 +64,7 @@ def configure_agent_training(agent_name, env):
             os.makedirs(checkpoint_path)
         if os.path.exists(checkpoint_path + "checkpoint_nfsp.pt"):
             agent = NFSPAgent.from_checkpoint(checkpoint=torch.load(checkpoint_path + "checkpoint_nfsp.pt"))
+            agent.rule = gin_rummy_rule_filter
             with open(checkpoint_path + "checkpoint.txt") as f:
                 start_episodes = int(next(f))
         else:
@@ -70,7 +74,8 @@ def configure_agent_training(agent_name, env):
                     hidden_layers_sizes=[64,64],
                     q_mlp_layers=[64,64],
                     device=device,
-                    save_path=checkpoint_path
+                    save_path=checkpoint_path,
+                    rule=gin_rummy_rule_filter
                 )
         
     if start_episodes != 0:

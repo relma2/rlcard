@@ -65,7 +65,8 @@ class NFSPAgent(object):
                  evaluate_with='average_policy',
                  device=None,
                  save_path=None,
-                 save_every=float('inf')):
+                 save_every=float('inf'),
+                 rule=lambda actions, state: actions):
         ''' Initialize the NFSP agent.
 
         Args:
@@ -92,6 +93,7 @@ class NFSPAgent(object):
             q_train_step (int): Train the model every X steps.
             q_mlp_layers (list): The layer sizes of inner DQN agent.
             device (torch.device): Whether to use the cpu or gpu
+            rule (list(actions), state -> list(actions)): Reduces the list of actions to a smaller set based on rule agent logic.
         '''
         self.use_raw = False
         self._num_actions = num_actions
@@ -102,6 +104,7 @@ class NFSPAgent(object):
         self._sl_learning_rate = sl_learning_rate
         self._anticipatory_param = anticipatory_param
         self._min_buffer_size_to_learn = min_buffer_size_to_learn
+        self.rule = rule
 
         self._reservoir_buffer = ReservoirBuffer(reservoir_buffer_capacity)
         self._prev_timestep = None
@@ -174,7 +177,7 @@ class NFSPAgent(object):
             action (int): An action id
         '''
         obs = state['obs']
-        legal_actions = list(state['legal_actions'].keys())
+        legal_actions = self.rule(list(state['legal_actions'].keys()), state)
         if self._mode == 'best_response':
             action = self._rl_agent.step(state)
             one_hot = np.zeros(self._num_actions)
@@ -202,7 +205,7 @@ class NFSPAgent(object):
             action, info = self._rl_agent.eval_step(state)
         elif self.evaluate_with == 'average_policy':
             obs = state['obs']
-            legal_actions = list(state['legal_actions'].keys())
+            legal_actions = self.rule(list(state['legal_actions'].keys()), state)
             probs = self._act(obs)
             probs = remove_illegal(probs, legal_actions)
             action = np.random.choice(len(probs), p=probs)

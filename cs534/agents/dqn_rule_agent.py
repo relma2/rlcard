@@ -34,7 +34,7 @@ from collections import namedtuple
 from copy import deepcopy
 
 from rlcard.utils.utils import remove_illegal
-
+from rlcard.games.gin_rummy.utils.action_event import *
 Transition = namedtuple('Transition', ['state', 'action', 'reward', 'next_state', 'done', 'legal_actions'])
 
 
@@ -59,7 +59,8 @@ class DQNAgent(object):
                  learning_rate=0.00005,
                  device=None,
                  save_path=None,
-                 save_every=float('inf'),):
+                 save_every=float('inf'),
+                 rule=lambda actions, state: actions):
 
         '''
         Q-Learning algorithm for off-policy TD control using Function Approximation.
@@ -86,6 +87,7 @@ class DQNAgent(object):
             device (torch.device): whether to use the cpu or gpu
             save_path (str): The path to save the model checkpoints
             save_every (int): Save the model every X training steps
+            rule (list(actions), state -> list(actions)): Reduces the list of actions to a smaller set based on rule agent logic.
         '''
         self.use_raw = False
         self.replay_memory_init_size = replay_memory_init_size
@@ -95,6 +97,7 @@ class DQNAgent(object):
         self.batch_size = batch_size
         self.num_actions = num_actions
         self.train_every = train_every
+        self.rule = rule
 
         # Torch device
         if device is None:
@@ -151,7 +154,8 @@ class DQNAgent(object):
         '''
         q_values = self.predict(state)
         epsilon = self.epsilons[min(self.total_t, self.epsilon_decay_steps-1)]
-        legal_actions = list(state['legal_actions'].keys())
+
+        legal_actions = self.rule(list(state['legal_actions'].keys()), state)
         probs = np.ones(len(legal_actions), dtype=float) * epsilon / len(legal_actions)
         best_action_idx = legal_actions.index(np.argmax(q_values))
         probs[best_action_idx] += (1.0 - epsilon)
@@ -189,7 +193,7 @@ class DQNAgent(object):
         
         q_values = self.q_estimator.predict_nograd(np.expand_dims(state['obs'], 0))[0]
         masked_q_values = -np.inf * np.ones(self.num_actions, dtype=float)
-        legal_actions = list(state['legal_actions'].keys())
+        legal_actions = self.rule(list(state['legal_actions'].keys()), state)
         masked_q_values[legal_actions] = q_values[legal_actions]
 
         return masked_q_values
