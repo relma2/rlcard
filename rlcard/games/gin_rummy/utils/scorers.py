@@ -21,15 +21,16 @@ from rlcard.games.gin_rummy.utils import utils
 
 class GinRummyScorer:
 
-    def __init__(self, name: str = None, get_payoff: Callable[[GinRummyPlayer, 'GinRummyGame'], int or float] = None):
+    def __init__(self, name: str = None, get_payoff: Callable[[GinRummyPlayer, GinRummyPlayer, 'GinRummyGame'], int or float] = None):
         self.name = name if name is not None else "GinRummyScorer"
-        self.get_payoff = get_payoff if get_payoff else get_payoff_gin_rummy_v1
+        self.get_payoff = get_payoff if get_payoff else get_payoff_gin_rummy_scoring
 
     def get_payoffs(self, game: 'GinRummyGame'):
         payoffs = [0, 0]
         for i in range(2):
             player = game.round.players[i]
-            payoff = self.get_payoff(player=player, game=game)
+            opponent = game.round.players[1-i]
+            payoff = self.get_payoff(player=player, opponent=opponent, game=game)
             payoffs[i] = payoff
         return payoffs
 
@@ -53,7 +54,7 @@ def get_payoff_gin_rummy_v0(player: GinRummyPlayer, game: 'GinRummyGame') -> int
     return deadwood_count
 
 
-def get_payoff_gin_rummy_v1(player: GinRummyPlayer, game: 'GinRummyGame') -> float:
+def get_payoff_gin_rummy_v1(player: GinRummyPlayer, opponent:GinRummyPlayer, game: 'GinRummyGame') -> float:
     ''' Get the payoff of player:
             a) 1.0 if player gins
             b) 0.2 if player knocks
@@ -81,3 +82,21 @@ def get_payoff_gin_rummy_v1(player: GinRummyPlayer, game: 'GinRummyGame') -> flo
         deadwood_count = utils.get_deadwood_count(hand, best_meld_cluster)
         payoff = -deadwood_count / 100
     return payoff
+
+def get_payoff_gin_rummy_scoring(player: GinRummyPlayer, opponent:GinRummyPlayer, game: 'GinRummyGame') -> float:
+    best_meld_clusters = melding.get_best_meld_clusters(hand=player.hand)
+    best_meld_cluster = [] if not best_meld_clusters else best_meld_clusters[0]
+    score = -utils.get_deadwood_count(player.hand, best_meld_cluster)
+
+    best_meld_clusters = melding.get_best_meld_clusters(hand=opponent.hand)
+    best_meld_cluster = [] if not best_meld_clusters else best_meld_clusters[0]
+    score += utils.get_deadwood_count(opponent.hand, best_meld_cluster)
+    
+    going_out_action = game.round.going_out_action
+    going_out_player_id = game.round.going_out_player_id
+    if going_out_action == isinstance(going_out_action, GinAction):
+        if going_out_player_id == player.player_id:
+            score += 20
+        else:
+            score -= 20
+    return score / 120

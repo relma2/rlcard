@@ -16,4 +16,4 @@ docs/sphinx
 experiments/
 dist/
 rlcard/games/doudizhu/jsondata/
-rlcard/agents/gin_rummy_human_agent/gui_cards/cards_png
+rlcard/agents/human_agents/gin_rummy_human_agent/gui_cards/cards_png/
