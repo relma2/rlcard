@@ -169,7 +169,7 @@ if __name__ == '__main__':
                 agent.feed(ts)
 
             # Evaluate the performance. Play with random agents.
-            if (start_episodes + episode) % 100 == 0 or (start_episodes == 0 and episode == 0):
+            if (start_episodes + episode) % 100 == 0 or (start_episodes == 0 and episode == 1):
                 logger.store_performance(
                     episode,
                     tournament(
