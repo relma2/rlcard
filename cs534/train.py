@@ -8,16 +8,19 @@ import rlcard
 from agents.dqn_rule_agent import DQNAgent
 from agents.nfsp_rule_agent import NFSPAgent
 from agents.rule_filter import gin_rummy_rule_filter
-from utils.logger import Logger
+from utils.logger import (
+    Logger,
+    plot_curve
+)
 from rlcard.utils import (
     get_device,
     set_seed,
     tournament,
-    reorganize,
-    plot_curve
+    reorganize
 )
 from rlcard.envs.gin_rummy import GinRummyEnv
 from rlcard.models.gin_rummy_rule_models import GinRummyNoviceRuleAgent
+from rlcard.agents import RandomAgent
 
 available_agents = ["dqn", "nfsp"]
 available_agents_message = "Potential agents are '" + "', '".join(available_agents) + "'"
@@ -128,6 +131,7 @@ if __name__ == '__main__':
         'seed': seed,
     }
     env = GinRummyEnv(config)
+    rand_env = GinRummyEnv(config)
 
     # Get agent
     agent_name = get_agent_name(args)
@@ -137,11 +141,17 @@ if __name__ == '__main__':
     opponent = GinRummyNoviceRuleAgent()
     env.set_agents([agent, opponent])
 
+    random_agent = RandomAgent(rand_env.num_actions)
+    rand_env.set_agents([agent, random_agent])
+
     # Train
     model_dir = f"cs534/models/{agent_name}/"
     checkpoint_path = os.path.join(model_dir, "checkpoint/")
     checkpoint_txt_path = os.path.join(checkpoint_path, "checkpoint.txt")
     with Logger(model_dir + "log/") as logger:
+        # Get the paths
+        csv_path, fig_path = logger.csv_path, logger.fig_path
+
         for episode in range(start_episodes + 1, num_episodes + start_episodes + 1):
             if agent_name == 'nfsp':
                 agent.sample_episode_policy()
@@ -159,15 +169,20 @@ if __name__ == '__main__':
                 agent.feed(ts)
 
             # Evaluate the performance. Play with random agents.
-            if (start_episodes + episode) % 50 == 0:
-                logger.log_performance(
+            if (start_episodes + episode) % 100 == 0 or (start_episodes == 0 and episode == 0):
+                logger.store_performance(
                     episode,
                     tournament(
                         env,
-                        2000,
+                        5000,
+                    )[0],
+                    tournament(
+                        rand_env,
+                        5000,
                     )[0]
                 )
-                if (start_episodes + episode) % 250 == 0:
+                if (start_episodes + episode) % 1000 == 0:
+                    logger.flush_performance()
                     save_path = os.path.join(model_dir, f"{agent_name}_{episode}.pth")
                     torch.save(agent, save_path)
                     agent.save_checkpoint(checkpoint_path)
@@ -175,11 +190,7 @@ if __name__ == '__main__':
                     f.write(str(episode))
                     f.close()
 
-                    print(f"Model saved in {save_path}")
+                    # Plot the learning curve
+                    plot_curve(csv_path, fig_path, agent_name)
 
-        # Get the paths
-        csv_path, fig_path = logger.csv_path, logger.fig_path
-
-    # Plot the learning curve
-    plot_curve(csv_path, fig_path, agent_name)
 
