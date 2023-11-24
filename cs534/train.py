@@ -29,6 +29,7 @@ def get_agent_name(args):
         else:
             raise Exception("No such agent.")
 
+    print("What would you like to train?")
     agent = ""
     print(available_agents_message)
     print("Please select agent: ", end="")
@@ -129,7 +130,6 @@ if __name__ == '__main__':
     env = GinRummyEnv(config)
 
     # Get agent
-    print("What would you like to train?")
     agent_name = get_agent_name(args)
 
     # Get actual agent
@@ -159,7 +159,7 @@ if __name__ == '__main__':
                 agent.feed(ts)
 
             # Evaluate the performance. Play with random agents.
-            if episode % 50 == 0:
+            if (start_episodes + episode) % 50 == 0:
                 logger.log_performance(
                     episode,
                     tournament(
@@ -167,14 +167,15 @@ if __name__ == '__main__':
                         2000,
                     )[0]
                 )
-                save_path = os.path.join(model_dir, f"{agent_name}_{episode}.pth")
-                torch.save(agent, save_path)
-                agent.save_checkpoint(checkpoint_path)
-                f = open(checkpoint_txt_path, "w")
-                f.write(str(episode))
-                f.close()
+                if (start_episodes + episode) % 250 == 0:
+                    save_path = os.path.join(model_dir, f"{agent_name}_{episode}.pth")
+                    torch.save(agent, save_path)
+                    agent.save_checkpoint(checkpoint_path)
+                    f = open(checkpoint_txt_path, "w")
+                    f.write(str(episode))
+                    f.close()
 
-                print(f"Model saved in {save_path}")
+                    print(f"Model saved in {save_path}")
 
         # Get the paths
         csv_path, fig_path = logger.csv_path, logger.fig_path

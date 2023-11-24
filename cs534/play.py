@@ -5,10 +5,9 @@ import argparse
 from random import randrange
 
 import rlcard
-from rlcard.agents import (
-    DQNAgent,
-    RandomAgent,
-)
+from agents.dqn_rule_agent import DQNAgent
+from agents.nfsp_rule_agent import NFSPAgent
+from rlcard.agents import RandomAgent
 from rlcard.utils import (
     get_device,
     set_seed,
