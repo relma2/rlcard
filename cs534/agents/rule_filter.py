@@ -8,6 +8,8 @@ def gin_rummy_rule_filter(legal_actions, state):
     for action in legal_actions:
         if isinstance(ActionEvent.decode_action(action), DiscardAction):
             discard_actions.append(action)
+        elif isinstance(ActionEvent.decode_action(action), GinAction):
+            return [action]
         else:
             filtered_actions.append(action)
 

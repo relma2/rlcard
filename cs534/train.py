@@ -169,7 +169,9 @@ if __name__ == '__main__':
                 agent.feed(ts)
 
             # Evaluate the performance. Play with random agents.
-            if (start_episodes + episode) % 100 == 0 or (start_episodes == 0 and episode == 1):
+            if episode % 2000 == 0 or episode == 1:
+                print("\n*****************************************************")
+                print(f"Running episode {episode} evaluation tournament.")
                 logger.store_performance(
                     episode,
                     tournament(
@@ -181,7 +183,10 @@ if __name__ == '__main__':
                         5000,
                     )[0]
                 )
-                if (start_episodes + episode) % 1000 == 0:
+                print(f"\nFinished episode {episode} evaluation tournament.")
+                print("*****************************************************\n")
+
+                if episode % 10000 == 0:
                     logger.flush_performance()
                     save_path = os.path.join(model_dir, f"{agent_name}_{episode}.pth")
                     torch.save(agent, save_path)

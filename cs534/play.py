@@ -119,7 +119,7 @@ if __name__ == '__main__':
     if "human" in [agent.name for agent in agents]:
         GameApp(lambda: env)
     else:
-        steps = 1000
+        steps = 2000
         payoff = [0,0]
         for i in range(steps):
             _, _payoff = env.run()

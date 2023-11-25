@@ -54,7 +54,7 @@ def get_payoff_gin_rummy_v0(player: GinRummyPlayer, game: 'GinRummyGame') -> int
     return deadwood_count
 
 
-def get_payoff_gin_rummy_v1(player: GinRummyPlayer, opponent:GinRummyPlayer, game: 'GinRummyGame') -> float:
+def get_payoff_gin_rummy_v1(player: GinRummyPlayer, opponent: GinRummyPlayer, game: 'GinRummyGame') -> float:
     ''' Get the payoff of player:
             a) 1.0 if player gins
             b) 0.2 if player knocks
@@ -83,20 +83,33 @@ def get_payoff_gin_rummy_v1(player: GinRummyPlayer, opponent:GinRummyPlayer, gam
         payoff = -deadwood_count / 100
     return payoff
 
-def get_payoff_gin_rummy_scoring(player: GinRummyPlayer, opponent:GinRummyPlayer, game: 'GinRummyGame') -> float:
+def get_payoff_gin_rummy_scoring(player: GinRummyPlayer, opponent: GinRummyPlayer, game: 'GinRummyGame') -> float:
+    score = 0
     best_meld_clusters = melding.get_best_meld_clusters(hand=player.hand)
     best_meld_cluster = [] if not best_meld_clusters else best_meld_clusters[0]
-    score = -utils.get_deadwood_count(player.hand, best_meld_cluster)
+    player_deadwood = utils.get_deadwood_count(player.hand, best_meld_cluster)
 
     best_meld_clusters = melding.get_best_meld_clusters(hand=opponent.hand)
     best_meld_cluster = [] if not best_meld_clusters else best_meld_clusters[0]
-    score += utils.get_deadwood_count(opponent.hand, best_meld_cluster)
+    opponent_deadwood = utils.get_deadwood_count(opponent.hand, best_meld_cluster)
     
     going_out_action = game.round.going_out_action
     going_out_player_id = game.round.going_out_player_id
     if going_out_action == isinstance(going_out_action, GinAction):
         if going_out_player_id == player.player_id:
-            score += 20
+            score += 20 + opponent_deadwood
         else:
-            score -= 20
+            score -= 20 + player_deadwood
+    elif isinstance(going_out_action, KnockAction):
+        score = opponent_deadwood - player_deadwood
+        # Check for undercut
+        if going_out_player_id == player.player_id and score < 0:
+            score -= 10
+        elif going_out_player_id != player.player_id and score > 0:
+            score += 10
+    else:
+        score = -player_deadwood
+
+
+    
     return score / 120
