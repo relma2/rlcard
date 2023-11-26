@@ -97,9 +97,9 @@ def get_payoff_gin_rummy_scoring(player: GinRummyPlayer, opponent: GinRummyPlaye
     going_out_player_id = game.round.going_out_player_id
     if going_out_action == isinstance(going_out_action, GinAction):
         if going_out_player_id == player.player_id:
-            score += 20 + opponent_deadwood
+            score = 20 + opponent_deadwood
         else:
-            score -= 20 + player_deadwood
+            score = - 20 - player_deadwood
     elif isinstance(going_out_action, KnockAction):
         score = opponent_deadwood - player_deadwood
         # Check for undercut

@@ -16,6 +16,10 @@ from rlcard.utils import (
 from rlcard.envs.gin_rummy import GinRummyEnv
 from rlcard.agents.human_agents.gin_rummy_human_agent.gin_rummy_human_agent import HumanAgent
 from rlcard.models.gin_rummy_rule_models import GinRummyNoviceRuleAgent
+from agents.more_rule_agents import (
+    GinRummyAlwaysReduceRuleAgent,
+    GinRummyMeldRuleAgent
+)
 from rlcard.agents.human_agents.gin_rummy_human_agent.gui_gin_rummy.game_app import GameApp
 from train import available_agents
 
@@ -35,7 +39,7 @@ class StoredAgent:
         return self.name
 
 
-available_simple_agents = ["random", "rule"]
+available_simple_agents = ["random", "rule_discard", "rule_minimize", "rule_meld"]
 available_agents_message = "Potential agents are 'human', '" + "', '".join(available_agents + available_simple_agents) + "'"
 
 def load_model(stored_agent, env, position, device):
@@ -43,8 +47,12 @@ def load_model(stored_agent, env, position, device):
         return HumanAgent(env.num_actions)
     elif (stored_agent.name == "random"):
         return RandomAgent(env.num_actions)
-    elif (stored_agent.name == "rule"):
+    elif (stored_agent.name == "rule_discard"):
         return GinRummyNoviceRuleAgent()
+    elif (stored_agent.name == "rule_minimize"):
+        return GinRummyAlwaysReduceRuleAgent()
+    elif (stored_agent.name == "rule_meld"):
+        return GinRummyMeldRuleAgent()
 
     model_path = f"cs534/models/{stored_agent.name}/{stored_agent.__str__()}.pth"
 
