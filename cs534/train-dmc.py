@@ -14,7 +14,7 @@ from utils.logger import (
     Logger,
     plot_curve
 )
-from rlcard.rlcard.utils import (
+from rlcard.utils import (
     get_device,
     set_seed,
     tournament,
