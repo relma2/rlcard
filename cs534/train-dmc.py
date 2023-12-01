@@ -20,9 +20,9 @@ from rlcard.utils import (
     tournament,
     reorganize
 )
-from rlcard.rlcard.envs.gin_rummy import GinRummyEnv
-from rlcard.rlcard.models.gin_rummy_rule_models import GinRummyNoviceRuleAgent
-from rlcard.rlcard.agents import RandomAgent
+from rlcard.envs.gin_rummy import GinRummyEnv
+from rlcard.models.gin_rummy_rule_models import GinRummyNoviceRuleAgent
+from rlcard.agents import RandomAgent
 
 if __name__ == '__main__':
 
